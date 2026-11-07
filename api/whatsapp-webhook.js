@@ -1,27 +1,14 @@
-
 module.exports = async (req, res) => {
   const verifyToken = process.env.WHATSAPP_VERIFY_TOKEN;
 
   if (req.method === "GET") {
-    const mode = req.query["hub.mode"];
-    const token = req.query["hub.verify_token"];
-    const challenge = req.query["hub.challenge"];
-
-    if (
-      mode === "subscribe" &&
-      token === verifyToken &&
-      verifyToken
-    ) {
-      return res.status(200).send(challenge);
-    }
-
-    return res.status(403).send("Verification failed");
+    return res.status(200).json({
+      method: "GET",
+      tokenExists: !!verifyToken,
+      tokenLength: verifyToken ? verifyToken.length : 0,
+      receivedTokenMatches: req.query["hub.verify_token"] === verifyToken
+    });
   }
 
-  if (req.method === "POST") {
-    console.log("WhatsApp webhook received");
-    return res.status(200).send("EVENT_RECEIVED");
-  }
-
-  return res.status(405).send("Method not allowed");
+  return res.status(200).send("OK");
 };
